@@ -1,0 +1,164 @@
+---
+title: "Building This Website with Quarto and GitHub Pages"
+date: 2026-02-19
+description: "How I migrated a plain-markdown CV into a Quarto-powered website with a blog, deployed automatically via GitHub Actions."
+categories: [quarto, github-pages, website]
+---
+
+This site started as a single `index.md` file rendered by GitHub Pages with the Jekyll Minimal theme — fine for a static CV, but with no room to grow. I wanted a place to host my CV *and* write occasional posts about research, tools, and methods I find useful. This post documents the migration to [Quarto](https://quarto.org).
+
+## Why Quarto?
+
+Quarto is an open-source scientific publishing system built on Pandoc. It is especially well-suited for researchers because it:
+
+- Renders Markdown, R Markdown, and Jupyter notebooks
+- Has first-class support for citations, cross-references, and equations
+- Generates a full static website with navigation, search, and blog listings out of the box
+- Integrates natively with GitHub Actions for continuous deployment
+
+For a biomedical research CV that might one day host data analyses or methods notes, Quarto is a natural fit.
+
+## Repository Structure
+
+The final layout is straightforward:
+
+```
+CV/
+├── _quarto.yml                        # project & site configuration
+├── index.qmd                          # CV (front page)
+├── .nojekyll                          # tells GitHub Pages to skip Jekyll
+├── blog/
+│   ├── index.qmd                      # blog listing page
+│   └── posts/
+│       └── 2026-02-19-building-this-website/
+│           └── index.qmd             # this post
+└── .github/
+    └── workflows/
+        └── deploy.yml                 # GitHub Actions workflow
+```
+
+## The Project Configuration
+
+`_quarto.yml` is the single file that controls everything about the site:
+
+```yaml
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "Ruisheng Xu"
+  site-url: https://Ruisheng5039.github.io/CV
+  navbar:
+    left:
+      - href: index.qmd
+        text: CV
+      - href: blog/index.qmd
+        text: Blog
+    right:
+      - icon: github
+        href: https://github.com/Ruisheng5039
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+```
+
+The `site-url` is important: it lets Quarto generate correct absolute links when the site lives at a subpath (`/CV`) rather than at the root domain.
+
+## The CV Page
+
+The original `index.md` was converted to `index.qmd` — the only real change is the YAML front matter block at the top:
+
+```yaml
+---
+title: "Ruisheng Xu"
+subtitle: "Ph.D. Student, Biomedical Engineering — Pennsylvania State University"
+page-layout: article
+toc: true
+---
+```
+
+The rest of the content is identical Markdown.
+
+## The Blog
+
+Quarto's listing feature turns a directory of posts into a browsable index automatically. The `blog/index.qmd` page needs just a few lines:
+
+```yaml
+---
+title: "Blog"
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: true
+page-layout: full
+---
+```
+
+Each post lives in its own subdirectory under `blog/posts/` and includes a YAML front matter block with `title`, `date`, `description`, and `categories`. Quarto picks all of this up automatically and builds the listing page, category filters, and RSS feed.
+
+## Automated Deployment with GitHub Actions
+
+The deployment workflow at `.github/workflows/deploy.yml` runs on every push to `main`:
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: quarto-dev/quarto-actions/setup@v2
+      - uses: actions/configure-pages@v5
+      - uses: quarto-dev/quarto-actions/render@v2
+        with:
+          to: html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+```
+
+The workflow uses the official `quarto-dev/quarto-actions` to install Quarto and render the project, then hands off the `_site` output directory to GitHub's own deployment actions. No secrets or personal access tokens are required — the `GITHUB_TOKEN` provided automatically by Actions is sufficient.
+
+### One-time Setup in GitHub
+
+After pushing, you need to tell GitHub to use Actions as the Pages source:
+
+1. Go to **Settings → Pages** in your repository.
+2. Under **Source**, select **GitHub Actions**.
+
+After that, every push to `main` triggers a new deployment automatically.
+
+## Result
+
+The site now has a clean top navigation bar linking the CV and the blog, a table of contents on longer pages, category filtering on the blog listing, and a GitHub icon linking to my profile. The whole thing is rendered from plain text files and deployed without any manual steps.
+
+Future posts will cover research methods, data analysis workflows, and tools I find useful for biomedical imaging.
