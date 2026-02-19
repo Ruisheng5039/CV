@@ -1,0 +1,15 @@
+---
+title: "Seminar Reflection"
+author: "Ruisheng"
+date: "2026-02-19"
+categories: [update]
+---
+
+Today I went to attend a seminar, here is my reflection.
+
+This lecture provided a clear perspective on how lipid movement between organelles supports normal cellular function, especially under conditions of stress or damage.
+The membranes are constantly changing due to growth, transport, and metabolism, yet each organelle must maintain its own identity and function. This balance requires continuous movement of lipids between membranes, not only through vesicles, but also through direct communication between organelles that come very close to each other.
+A key idea introduced in the lecture was that certain proteins can form bridge-like structures between organelles, allowing lipids to move directly from one membrane to another. This type of bulk lipid transfer represents a relatively new way of thinking about membrane biology. Rather than transferring lipids one by one, these bridges may enable faster and more efficient movement of membrane material, which is especially important during rapid cellular responses.
+The lecture then focused on specific proteins that operate at membranes associated with endosomes and lysosomes. I found it particularly interesting that the talk centered on BLTP3A, a protein that had not been well understood before. The research presented showed that this protein plays a role in repairing damaged lysosomes, which are essential for breaking down waste and maintaining cellular health. This helped me appreciate how membrane repair is an active, regulated process rather than a passive one.
+Overall, this lecture helped me understand how inter-organelle communication supports membrane stability and cell survival. 
+
